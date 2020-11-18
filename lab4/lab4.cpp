@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
+#include <ctime>
 
 void printdir(char *dir, int depth){
     DIR *dp;
@@ -19,20 +20,54 @@ void printdir(char *dir, int depth){
     	printf("chdir error!\n");
     	return;
     }   
-    printf("current working directory: %s\n",getcwd(NULL,NULL));
+    printf("\ncurrent working directory: %s\n",getcwd(NULL,NULL));
     while((entry=readdir(dp))!=NULL){
     	lstat(entry->d_name,&statbuf);   
         if(S_ISDIR(statbuf.st_mode)){
+        	char modestr[11];
+        	strcpy(modestr,"----------");
+        	 if (S_ISDIR(statbuf.st_mode))modestr[0] =  'd' ;
+	         if (S_ISCHR(statbuf.st_mode))modestr[0] =  'c' ;
+	         if (S_ISBLK(statbuf.st_mode))modestr[0] =  'b' ;
+	 
+	         if (statbuf.st_mode&S_IRUSR)modestr[1] =  'r' ;
+	         if (statbuf.st_mode&S_IWUSR)modestr[2] =  'w' ;
+	         if (statbuf.st_mode&S_IXUSR)modestr[3] =  'x' ;
+	 
+	         if (statbuf.st_mode&S_IRGRP)modestr[4] =  'r' ;
+	         if (statbuf.st_mode&S_IWGRP)modestr[5] =  'w' ;
+	         if (statbuf.st_mode&S_IXGRP)modestr[6] =  'x' ;
+	 
+	         if (statbuf.st_mode&S_IROTH)modestr[7] =  'r' ;
+	         if (statbuf.st_mode&S_IWOTH)modestr[8] =  'w' ;
+	         if (statbuf.st_mode&S_IXOTH)modestr[9] =  'x' ; 
             if(!strcmp(entry->d_name,".")||!strcmp(entry->d_name,".."))
                	 continue;
             //打印目录项的深度、目录名等信息
-            printf("%d %s %lu\n",depth,entry->d_name,statbuf.st_atime);
+            printf("%s  filename:%s  last modefied time:%.12s\n",modestr,entry->d_name,4+ctime(&statbuf.st_atime));
             //递归调用printdir,打印子目录的信息,其中的depth+4;
             printdir(entry->d_name,depth+4);
         } 
 	 	else{
-	 		printf("%d %s %lu\n",depth,entry->d_name,statbuf.st_atime);
-	 	}
+	 		char modestr[11];
+        	strcpy(modestr,"----------");
+        	 if (S_ISDIR(statbuf.st_mode))modestr[0] =  'd' ;
+	         if (S_ISCHR(statbuf.st_mode))modestr[0] =  'c' ;
+	         if (S_ISBLK(statbuf.st_mode))modestr[0] =  'b' ;
+	 
+	         if (statbuf.st_mode&S_IRUSR)modestr[1] =  'r' ;
+	         if (statbuf.st_mode&S_IWUSR)modestr[2] =  'w' ;
+	         if (statbuf.st_mode&S_IXUSR)modestr[3] =  'x' ;
+	 
+	         if (statbuf.st_mode&S_IRGRP)modestr[4] =  'r' ;
+	         if (statbuf.st_mode&S_IWGRP)modestr[5] =  'w' ;
+	         if (statbuf.st_mode&S_IXGRP)modestr[6] =  'x' ;
+	 
+	         if (statbuf.st_mode&S_IROTH)modestr[7] =  'r' ;
+	         if (statbuf.st_mode&S_IWOTH)modestr[8] =  'w' ;
+	         if (statbuf.st_mode&S_IXOTH)modestr[9] =  'x' ; 
+	 		printf("%s  filename:%s  last modefied time:%.12s\n",modestr,entry->d_name,4+ctime(&statbuf.st_atime));
+        }
     }
     char a[100];
     strcpy(a,getcwd(NULL,NULL));
@@ -47,7 +82,7 @@ void printdir(char *dir, int depth){
     	printf("chdir error!\n");
     	return;
     }   
-    printf("return to directory: %s\n",getcwd(NULL,NULL));
+    printf("\nreturn to directory: %s\n",getcwd(NULL,NULL));
 
     closedir(dp);//关闭目录项; 
 }
